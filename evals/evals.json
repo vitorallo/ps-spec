@@ -1,0 +1,26 @@
+{
+  "skill_name": "ps-spec",
+  "evals": [
+    {
+      "id": 1,
+      "name": "prd-to-epics",
+      "prompt": "I have a PRD.md and ARCHITECTURE.md for a small task tracker app in this repo. Set the project up with ps-spec and generate the epics so we can start building epic by epic. Don't start planning or coding any epic yet - stop once the epics are ready for me to review.",
+      "expected_output": "openspec/ initialized with schema ps-spec (openspec/schemas/ps-spec/schema.yaml, config.yaml schema: ps-spec with rules/operations and a filled context: block), doc/README.md index, CLAUDE.md with a ## ps-spec block, and EPICS.md at the root with: naming rule + status legend header, a status board table (ID/Epic/Change/Depends on/Status/Doc), E00 = scaffolding & environment (logging baseline, test harness, CI), feature epics in dependency order with user stories + acceptance criteria, scope/out-of-scope, dependency graph. No openspec change created, no branch.",
+      "files": ["fixtures/todo-app/PRD.md", "fixtures/todo-app/ARCHITECTURE.md"]
+    },
+    {
+      "id": 2,
+      "name": "plan-one-epic",
+      "prompt": "ps-spec plan E01",
+      "expected_output": "One OpenSpec change e01-task-api under openspec/changes/ with proposal.md (Epic + User Stories sections), specs/task-crud/spec.md (Purpose, ADDED requirements, 4-hash scenarios), design.md with an Observability section, tasks.md ending with Observability/Tests/Docs groups, test-plan.md with interactive rows naming a tool; `openspec validate e01-task-api --strict` passes; doc/task-api.md skeleton with status: draft and a row in doc/README.md; EPICS.md E01 status = planned; the agent presents a gate-1 summary and stops - no git branch created, no source code written.",
+      "files": ["fixtures/todo-app/PRD.md", "fixtures/todo-app/ARCHITECTURE.md", "fixtures/planned-repo/"]
+    },
+    {
+      "id": 3,
+      "name": "close-an-epic",
+      "prompt": "ps-spec next",
+      "expected_output": "Given a repo on branch epic/e01-task-api with all tasks ticked, test-plan all pass, and doc/task-api.md in status draft: the agent detects the doc phase, finalizes doc/task-api.md (status: final, Logs & debugging section filled, files table), updates the doc/README.md row, sets EPICS.md E01 to review, commits, then presents a gate-2 review summary (diff stat, test-plan table, doc link) and STOPS. It must not run openspec archive, must not merge into main, must not delete the branch.",
+      "files": ["fixtures/coded-repo/"]
+    }
+  ]
+}

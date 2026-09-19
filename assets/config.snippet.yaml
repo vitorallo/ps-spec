@@ -1,0 +1,26 @@
+# --- ps-spec (managed by ps-spec-init.sh; edit freely, the script won't overwrite an existing block) ---
+rules:
+  proposal:
+    - "Name the epic (E0N) this change implements and copy its user stories; every change maps to exactly one EPICS.md epic"
+  design:
+    - "Include an Observability section (logger names, boundary log lines, correlation ids, DEBUG switch)"
+    - "Include a Security section - if .claude/rules/security/ exists, name the rule files that apply to this change and how each is honoured (input validation, authn/authz, secrets, injection, data exposure); otherwise list the threats this change introduces and their mitigations, or `n/a` with a reason"
+  tasks:
+    - "End with three groups in this order - Observability, Tests, Docs - each task saying how it is verified"
+    - "The Tests group verifies every item of the design.md Security section (an automated test or an interactive case each)"
+    - "Tick each task `- [x]` the moment it lands, not at the end of the epic"
+  test-plan:
+    - "Every spec scenario maps to at least one automated test or interactive case"
+    - "Every interactive case names its tool (playwright | chrome | http | console | manual)"
+    - "Include observability checks - log lines that must be visible while the cases run"
+operations:
+  apply:
+    guidance:
+      - "Never code on main - work on the epic/<change-name> branch created in the code phase"
+      - "Logging is part of the feature - implement the design.md Observability section alongside the code"
+      - "Mark each task `- [x]` in tasks.md as it lands and commit per task group as `<type>(<change-name>): ...`"
+      - "When all tasks are checked, run test-plan.md and record results before asking for human review"
+  archive:
+    guidance:
+      - "Archive only after the human review gate - test-plan all pass, the feature doc is final, the docs index is updated, and the user said OK"
+      - "After archiving, merge the epic branch into main with --no-ff, tag it, delete the branch, and set the epic to done in EPICS.md"
