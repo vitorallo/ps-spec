@@ -69,16 +69,23 @@ Its vocabulary is deliberately different from OpenSpec's (`plan / code / close` 
 
 Requirements: Claude Code, Node ≥ 20.19, git. The `openspec` CLI is installed by `init` if missing (`npm i -g @fission-ai/openspec@latest`).
 
-**As a user-level skill (any project):**
+**Via the PEACH STUDIO marketplace (recommended):**
 
-```bash
-git clone <this-repo> ~/src/skills/ps-spec        # or wherever you keep skills
-ln -s ~/src/skills/ps-spec ~/.claude/skills/ps-spec
+```
+/plugin marketplace add vitorallo/peach-studio-marketplace
+/plugin install ps-spec@peach-studio
 ```
 
-**Per project:** copy or symlink the folder to `<project>/.claude/skills/ps-spec`.
+**As a user-level skill (any project), from a clone:**
 
-**Via the Peach Studio marketplace (when published):** `/plugin marketplace add vitorallo/peach-studio-marketplace` then `/plugin install ps-spec@peach-studio`.
+```bash
+git clone https://github.com/vitorallo/ps-spec ~/src/skills/ps-spec
+ln -s ~/src/skills/ps-spec/skills/ps-spec ~/.claude/skills/ps-spec
+```
+
+**Per project:** copy or symlink `skills/ps-spec` to `<project>/.claude/skills/ps-spec`.
+
+**On the pi coding agent:** use [ps-spec-pi](https://github.com/vitorallo/ps-spec-pi) (`pi install git:github.com/vitorallo/ps-spec-pi`) — same workflow, with an extension providing the checkpoint dialog and the guards.
 
 Start a new Claude Code session afterwards; skills load at session start.
 
@@ -121,10 +128,15 @@ Naming is fixed and never renumbered: epic `E0N` ⇒ change `e0N-<slug>` ⇒ bra
 - `doc/<feature>.md` `status: final` and indexed
 - CP4 approved and recorded → archived, merged into main with `--no-ff`, tagged, branch deleted, `EPICS.md` → `done`
 
-## Layout of this skill
+## Layout of this repo
+
+A Claude Code plugin: manifest at the root, the skill under `skills/ps-spec/` (paths below are relative to it).
 
 ```
 ps-spec/
+├── .claude-plugin/plugin.json   plugin manifest (name, version, skills path)
+├── README.md
+└── skills/ps-spec/
 ├── SKILL.md                     the workflow: checkpoints, phase detection, phases, delegation, guardrails
 ├── scripts/
 │   ├── ps-spec-status.sh        repo state dump the skill reads to pick the phase (always exit 0)

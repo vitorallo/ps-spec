@@ -1,0 +1,15 @@
+{
+  "name": "ps-spec",
+  "displayName": "ps-spec — epic-driven development on OpenSpec",
+  "version": "1.0.0",
+  "description": "Drive a software project from an idea or a PRD to shipped, tested, documented features with OpenSpec, one epic per change. PRD.md + ARCHITECTURE.md → EPICS.md with user stories → one OpenSpec change per epic (proposal, specs, design, tasks, test-plan) → git branch → code with observability built in → test plan with interactive debugging → feature doc → archive + merge. Four human checkpoints (PRD, epics, plan, validate) with an autonomous coding loop between them; a rules guard hook makes sure openspec config.yaml rules reach the model before every artifact is written; secure-coding rule packs (OWASP 2025, MCP/AI/agent/RAG, per-language and per-framework) installed at init.",
+  "author": {
+    "name": "PEACH STUDIO",
+    "url": "https://www.peachstudio.be"
+  },
+  "homepage": "https://www.peachstudio.be",
+  "repository": "https://github.com/vitorallo/ps-spec",
+  "license": "MIT",
+  "keywords": ["spec-driven", "openspec", "prd", "epics", "user-stories", "test-plan", "observability", "secure-coding", "owasp", "human-in-the-loop", "agentic-workflow"],
+  "skills": "./skills/"
+}
