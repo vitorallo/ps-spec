@@ -7,6 +7,11 @@ Source: [PRD.md](PRD.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · Changes: `open
 **Status legend:** `todo` → `planned` (change artifacts done, CP3 pending/passed) → `in-progress` (on branch, coding) → `verifying` (running test-plan) → `review` (docs done, waiting for CP4) → `done` (archived + merged). `dropped` for epics descoped.
 
 **Reviewed:** — <!-- set to the date the human approved this epic list (CP2); clear it when epics change -->
+<!-- Optional GitHub Projects mirror (see references/github-projects.md). Uncomment to enable; EPICS.md stays the source of truth.
+**GitHub-Project:** <owner>/<number>
+-->
+
+
 
 
 ## Status board

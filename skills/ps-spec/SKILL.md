@@ -225,6 +225,9 @@ places where you made a judgment call (a split milestone, an assumption),
 and stop. On approval write `Reviewed: <date>` in the `EPICS.md` header and
 commit; that line is what tells a later session it may start planning.
 When epics are added or changed later, clear the line and re-review.
+If the header has a `GitHub-Project:` line, also run
+`bash <this-skill-dir>/scripts/ps-spec-gh-sync.sh sync-epics` after the approval
+(one issue per epic, added to the project — see *GitHub Projects sync* below).
 
 ## Phase `plan E0N`
 
@@ -280,7 +283,8 @@ What ps-spec adds on top of stock OpenSpec:
   to realign the docs or the code.
 
 Set the epic to `planned` in `EPICS.md`, commit `plan(e0N-<slug>): ...` on
-main (planning artifacts are safe on main; code is not).
+main (planning artifacts are safe on main; code is not). If GitHub-Project is
+set, also run `ps-spec-gh-sync.sh set-status E0N planned`.
 
 **CP3.** Summarize the plan in ~10 lines (what changes, capabilities,
 number of tasks, how it will be tested, open questions) and stop. If they
@@ -300,7 +304,8 @@ Then implement `tasks.md` in order (`openspec instructions apply --change
 e0N-<slug>` prints the change context and the ps-spec apply guidance):
 
 - **Tick `- [x]` in `tasks.md` the moment a task lands**, and set the epic to
-  `in-progress` in `EPICS.md` on the first one. A stale tasks file is the
+  `in-progress` in `EPICS.md` on the first one (if GitHub-Project is set, also
+  `ps-spec-gh-sync.sh set-status E0N in-progress`). A stale tasks file is the
   single most common way a resumed session loses its place, and the status
   script reads those checkboxes.
 - Commit per task group: `feat(e0N-<slug>): <group>`; `fix`, `test`, `docs`,
@@ -337,7 +342,8 @@ it (`Result` column: `pass` / `fail (note)`):
 3. **Observability checks** — confirm the log lines from design.md actually
    appear while the cases run. Missing logs are a failing test.
 
-Set `EPICS.md` to `verifying`. On a failure: read the logs first (that's why
+Set `EPICS.md` to `verifying` (if GitHub-Project is set, also
+`ps-spec-gh-sync.sh set-status E0N verifying`). On a failure: read the logs first (that's why
 they exist), fix, commit `fix(e0N-<slug>): ...`, re-run the failing rows and
 the automated suite. This is the inner loop — keep going until every row is
 `pass`, without asking permission for each round. Don't edit expectations
@@ -376,7 +382,8 @@ poke at it), how to run and test, known gaps, references. Complete the
 doc nobody finds. Behavior stays in `openspec/specs/`; link, don't restate.
 Flip `status: final`, update the row in `<docs-dir>/README.md`, and refresh
 `openspec/config.yaml` `context:` if the stack or conventions changed during
-the epic. Commit `docs(e0N-<slug>): ...`. `EPICS.md` → `review`.
+the epic. Commit `docs(e0N-<slug>): ...`. `EPICS.md` → `review` (if GitHub-Project
+is set, also `ps-spec-gh-sync.sh set-status E0N review`).
 
 This doc is the project's memory. Write it for the next session that has
 never seen this code — that session is often you.
@@ -408,8 +415,34 @@ git tag e0N-<slug>-done-$(date +%Y%m%d)
 git branch -d epic/e0N-<slug>
 ```
 
-Set `EPICS.md` to `done` (commit `docs(epics): E0N done`), then announce the
-next epic in dependency order.
+Set `EPICS.md` to `done` (commit `docs(epics): E0N done`); if GitHub-Project is
+set, also `ps-spec-gh-sync.sh set-status E0N done` (this closes the epic's
+issue). Then announce the next epic in dependency order.
+
+## GitHub Projects sync (optional)
+
+Opt-in mirror of the `EPICS.md` board into a GitHub Project (Projects v2) linked
+to the repo. **`EPICS.md` stays the source of truth; the project is a mirror;
+when the switch is absent, nothing in this skill changes.**
+
+- **Switch:** a header line in `EPICS.md`, next to `Reviewed:`:
+  `**GitHub-Project:** <owner>/<number>`. The status script prints it as
+  `github_project:`.
+- **Enable once:** `bash <this-skill-dir>/scripts/ps-spec-gh-sync.sh init
+  --owner <owner> --repo <owner>/<repo>` — creates/reuses the project, links it,
+  adds a single-select field **Epic Status** carrying the legend 1:1
+  (todo, planned, in-progress, verifying, review, done, dropped) and the `epic`
+  label, then prints the header line. Needs the `project` token scope
+  (`gh auth refresh -s project,read:project` — the user runs it).
+- **What the phases push** (only when the switch is set): `epics` after CP2 →
+  `sync-epics` (one issue `E0N: <title>` per epic, label `epic`, body = the
+  epic's section, added to the project, status from the board); `plan` →
+  `planned`; `code` → `in-progress`; `test` → `verifying`; `doc` → `review`;
+  `close` → `done` + the issue is closed. All via `set-status E0N <status>`.
+- **Never blocks:** a sync failure warns and the phase continues; re-running
+  `sync-epics` re-asserts the board onto the project. `--dry-run` prints the gh
+  commands and makes no network calls. Details, status table and gh
+  limitations: `references/github-projects.md`.
 
 ## Delegation — when subagents help
 
@@ -470,4 +503,5 @@ Read the one that matches the phase you're in:
 - `references/observability.md` — logging conventions per stack (`plan`, `code`)
 - `references/docs-format.md` — feature doc + index contract (`plan`, `doc`)
 - `references/git-flow.md` — branch/commit/merge/tag/rollback and the four checkpoints (`code`, `close`)
+- `references/github-projects.md` — optional GitHub Projects mirror of `EPICS.md`: enable, status mapping, gh limits (`epics`, every status change)
 - `references/security-rules.md` — secure-coding rule packs: choosing, installing, how they reach the model (`init`, `plan`)

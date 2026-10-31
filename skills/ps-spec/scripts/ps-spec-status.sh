@@ -55,6 +55,9 @@ echo "rules_guard_hook: $( [ -f .claude/hooks/ps-spec-rules-guard.sh ] && echo y
 if [ -f EPICS.md ]; then
   REV="$(grep -m1 -E '^\*?\*?Reviewed:?\*?\*?' EPICS.md 2>/dev/null | sed -E 's/^\*?\*?Reviewed:?\*?\*?[[:space:]]*//')"
   if [ -n "$REV" ] && [ "$REV" != "—" ]; then echo "epics_reviewed: yes ($REV)"; else echo "epics_reviewed: no"; fi
+  # optional GitHub Projects mirror (references/github-projects.md): header line `GitHub-Project: <owner>/<number>`
+  GHP="$(grep -m1 -E '^\*?\*?GitHub-Project:?\*?\*?' EPICS.md 2>/dev/null | sed -E 's/^\*?\*?GitHub-Project:?\*?\*?[[:space:]]*//; s/[[:space:]].*$//')"
+  echo "github_project: ${GHP:-none}"
   echo "epics_board:"
   # rows like: | E01 | title | `e01-slug` | E00 | status | doc |
   awk -F'|' '
