@@ -227,7 +227,11 @@ cmd_sync_epics() {
     elif [ -z "$found" ]; then
       run issue create --repo "$REPO" --title "$id: $title" --label "$LABEL" --body-file "<section of $id>"
     else
-      log "$id: issue exists (#${found%%	*})"
+      # EPICS.md is the source of truth: re-assert the title and body on every sync
+      num="${found%%	*}"; body="$(mktemp)"; { epic_section "$id"; printf '\n\n---\n_Mirrored from EPICS.md by ps-spec. Change: `%s`. Edit EPICS.md, not this issue._\n' "$change"; } > "$body"
+      run issue edit "$num" --repo "$REPO" --title "$id: $title" --body-file "$body" >/dev/null || warn "$id: issue edit failed"
+      rm -f "$body"
+      log "$id: issue updated (#$num)"
     fi
     [ -n "$st" ] && set_item_status "$id" "$st" || true
   done < <(board_rows)

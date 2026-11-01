@@ -33,7 +33,7 @@ Put it next to `Reviewed:`. That line is the switch — when it is absent, nothi
 
 Then, once the board is approved (CP2): `ps-spec-gh-sync.sh sync-epics` creates one issue per epic
 (title `E0N: <title>`, label `epic`, body = the epic's section from `EPICS.md`), adds it to the project and
-sets its Epic Status from the board. Re-running is safe: issues are matched by the `E0N:` title prefix and
+sets its Epic Status from the board. Re-running is safe and also refreshes each issue's title and body from `EPICS.md`: issues are matched by the `E0N:` title prefix and
 never duplicated.
 
 ## Status mapping (`EPICS.md` → project field "Epic Status")
