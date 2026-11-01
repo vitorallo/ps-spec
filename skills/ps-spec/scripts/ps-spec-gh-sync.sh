@@ -142,14 +142,20 @@ set_item_status() {
   local id="$1" st="$2" found num url item oid
   valid_status "$st" || { warn "$id: unknown status '$st' (allowed: $STATUSES)"; return 1; }
   found="$(find_issue "$id")"
+  # issue search is eventually consistent: a just-created issue can take a few seconds to appear
+  local try; for try in 1 2 3 4 5; do
+    [ -n "$found" ] || [ "$DRY" = 1 ] && break
+    sleep 3; found="$(find_issue "$id")"
+  done
   [ "$DRY" = 1 ] && found="<issue-number>	https://github.com/$REPO/issues/<n>"
   [ -n "$found" ] || { warn "$id: no issue titled '$id: …' with label '$LABEL' in $REPO (run sync-epics)"; return 1; }
   num="${found%%	*}"; url="${found#*	}"
   item="$(find_item "$url")"
   if [ -z "$item" ]; then
     log "$id: adding issue #$num to project $OWNER/$NUM"
-    run project item-add "$NUM" --owner "$OWNER" --url "$url" --format json >/dev/null || { warn "$id: item-add failed"; return 1; }
-    item="$(find_item "$url")"; [ -n "$item" ] || { warn "$id: item not found after add"; return 1; }
+    # use the id item-add returns: item-list lags behind a just-added item
+    item="$(run project item-add "$NUM" --owner "$OWNER" --url "$url" --format json | jq -r '.id // empty')" || { warn "$id: item-add failed"; return 1; }
+    [ -n "$item" ] || { warn "$id: item-add returned no id"; return 1; }
   fi
   oid="${OPTION_ID[$st]:-}"
   [ -n "$oid" ] || { warn "$id: option '$st' missing on field '$FIELD_NAME' (recreate the field with all statuses)"; return 1; }
@@ -242,7 +248,7 @@ cmd_status() {
   if [ "$DRY" = 1 ]; then q project item-list "$NUM" --owner "$OWNER" -L 500 --format json >/dev/null; return 0; fi
   echo "project: $OWNER/$NUM  ($(gh project view "$NUM" --owner "$OWNER" --format json 2>/dev/null | jq -r '.url // "?"'))"
   q project item-list "$NUM" --owner "$OWNER" -L 500 --format json \
-    | jq -r '.items[]? | "  \(.content.number // "-")\t\(.["epic status"] // .["Epic Status"] // "-")\t\(.title // .content.title // "?")"' \
+    | jq -r '.items[]? | "  \(.content.number // "-")\t\(.["epic Status"] // .["epic status"] // .["Epic Status"] // "-")\t\(.title // .content.title // "?")"' \
     | sort -t$'\t' -k3 | column -t -s$'\t' 2>/dev/null || true
 }
 
